@@ -19,7 +19,6 @@ export default function Booking({ studio }: BookingProps) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
 
-    // ✅ Generate Time Slots from Studio Availability
     const generateTimeSlots = (open: string, close: string) => {
         const slots: string[] = [];
         let [openHour] = open.split(':').map(Number);
@@ -33,13 +32,11 @@ export default function Booking({ studio }: BookingProps) {
 
     const timeSlots = studio.Availability ? generateTimeSlots(studio.Availability.Open, studio.Availability.Close) : [];
 
-    // ✅ Get bookings from localStorage
     const getBookings = () => {
         const data = localStorage.getItem('bookings');
         return data ? JSON.parse(data) : [];
     };
 
-    // ✅ Handle Booking Submission
     const handleBooking = () => {
         if (!date || !timeSlot || !name || !email) {
             toast.error('Please fill all fields.');
@@ -48,7 +45,6 @@ export default function Booking({ studio }: BookingProps) {
 
         const existingBookings = getBookings();
 
-        // Check if time slot is already booked for this studio and date
         const isSlotTaken = existingBookings.some(
             (b: any) => b.studioId === studio.Id && b.date === date && b.timeSlot === timeSlot
         );
@@ -58,7 +54,6 @@ export default function Booking({ studio }: BookingProps) {
             return;
         }
 
-        // Save booking
         const newBooking = {
             studioId: studio.Id,
             studioName: studio.Name,
@@ -78,7 +73,7 @@ export default function Booking({ studio }: BookingProps) {
         setEmail('');
     };
 
-    // ✅ Render Stars for rating
+
     const renderStars = (rating: number) => {
         const stars = [];
         const fullStars = Math.floor(rating);

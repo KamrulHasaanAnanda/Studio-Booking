@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import StatsSection from '@/features/stats-section';
 import HeroSection from '@/features/hero-section';
 import GetDataLoader from '@/components/loaders/GetDataLoader';
 import EndResult from '@/components/studio-list/EndResult';
@@ -28,6 +27,7 @@ export default function Home() {
       locations.add(studio.Location.City);
       locations.add(studio.Location.Area);
     });
+
     return Array.from(locations).sort();
   }, []);
 
@@ -79,10 +79,10 @@ export default function Home() {
     updateSuggestions(value);
     setPage(1);
     fetchStudios(1, value);
-    setHasMore(false); // Disable infinite scroll while searching
+    setHasMore(false);
   }, [updateSuggestions, fetchStudios]);
 
-  // Handle suggestion click from autocomplete dropdown
+
   const handleSuggestionClick = useCallback((suggestion: string) => {
     setSearchQuery(suggestion);
     setShowSuggestions(false);
@@ -91,7 +91,7 @@ export default function Home() {
     setHasMore(false);
   }, [fetchStudios]);
 
-  // Clear the search and reset data
+
   const clearSearch = useCallback(() => {
     setSearchQuery('');
     setShowSuggestions(false);
@@ -101,21 +101,21 @@ export default function Home() {
     setHasMore(true);
   }, [fetchStudios]);
 
-  // Load more data for infinite scroll (only when no search active)
+
   const loadMoreData = () => {
     if (!loading && hasMore) {
       setPage(prev => prev + 1);
     }
   };
 
-  // Fetch more data on page change (only when no search active)
+
   useEffect(() => {
     if (!searchQuery.trim() && page) {
       fetchStudios(page);
     }
   }, [page, searchQuery, fetchStudios]);
 
-  // Close suggestions on clicking outside
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -129,7 +129,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
       <div className="container mx-auto px-6 py-12">
-        {/* Hero Section with Search */}
+
         <HeroSection
           studios={studios}
           searchRef={searchRef as React.RefObject<HTMLDivElement>}
@@ -139,11 +139,12 @@ export default function Home() {
           showSuggestions={showSuggestions}
           suggestions={suggestions}
           handleSuggestionClick={handleSuggestionClick}
+          allStudios={allStudios}
+          setStudios={setStudios}
+          setHasMore={setHasMore}
         />
 
-        {/* <StatsSection studios={allStudios.length} /> */}
 
-        {/* Studio List */}
         {!searchQuery ? (
           <InfiniteScroll
             dataLength={studios.length}
@@ -159,7 +160,7 @@ export default function Home() {
             </div>
           </InfiniteScroll>
         ) : (
-          // When searching, show filtered results without infinite scroll
+
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {studios.map((studio: any, index: number) => (
@@ -169,7 +170,7 @@ export default function Home() {
           </>
         )}
 
-        {/* No results message */}
+
         {searchQuery && studios.length === 0 && !loading && (
           <NotFound searchQuery={searchQuery} clearSearch={clearSearch} />
         )}

@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Filter studios by search if search query exists
+
         let filteredStudios = studios;
         if (search) {
             filteredStudios = studios.filter(studio =>
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
             },
         });
     } catch (error) {
-        console.error('Error fetching studios:', error);
+
         return NextResponse.json(
             { success: false, error: 'Failed to fetch studios' },
             { status: 500 }

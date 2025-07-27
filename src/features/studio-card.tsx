@@ -58,7 +58,7 @@ function StudioCard({ studio }: { studio: any }) {
 
                 {/* Amenities */}
                 <div className="mb-6">
-                    <h3 className="text-xsfont-semibold text-gray-800 mb-3">What's included</h3>
+                    <h3 className="text-sm font-semibold text-gray-800 mb-3">What's included</h3>
                     <div className="flex flex-wrap gap-2">
                         {studio.Amenities.slice(0, 3).map((amenity: string, index: number) => (
                             <span key={index} className="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full font-medium">
