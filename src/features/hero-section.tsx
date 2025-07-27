@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { getDistance } from '@/shared/utils/helpers';
 import { Studio } from '@/types/studio';
-import Link from 'next/link';
 
 interface HeroSectionProps {
     studios: Studio[];

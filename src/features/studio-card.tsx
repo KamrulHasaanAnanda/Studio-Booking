@@ -3,7 +3,8 @@ import React, { memo } from 'react'
 import { Studio } from '@/types/studio'
 import dynamic from 'next/dynamic'
 
-let StudioBookingDialog = dynamic(() => import('@/components/studio-list/StudioBookingDialog'), { ssr: false })
+const StudioBookingDialog = dynamic(() => import('@/components/studio-list/StudioBookingDialog'), { ssr: false })
+
 function StudioCard({ studio }: { studio: Studio }) {
     return (
         <div
