@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
             },
         });
     } catch (error) {
-
+        console.log('error', error);
         return NextResponse.json(
             { success: false, error: 'Failed to fetch studios' },
             { status: 500 }

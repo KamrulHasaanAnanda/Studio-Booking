@@ -3,17 +3,19 @@
 import React, { useState } from 'react';
 import { FaStar, FaStarHalfAlt } from 'react-icons/fa';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Studio } from '@/types/studio';
 
 interface BookingProps {
-    studio: any;
+    studio: Studio;
 }
 
-export default function Booking({ studio }: BookingProps) {
+export default function StudioBookingDialog({ studio }: BookingProps) {
     const [date, setDate] = useState('');
     const [timeSlot, setTimeSlot] = useState('');
     const [name, setName] = useState('');
@@ -21,8 +23,8 @@ export default function Booking({ studio }: BookingProps) {
 
     const generateTimeSlots = (open: string, close: string) => {
         const slots: string[] = [];
-        let [openHour] = open.split(':').map(Number);
-        let [closeHour] = close.split(':').map(Number);
+        const [openHour] = open.split(':').map(Number);
+        const [closeHour] = close.split(':').map(Number);
 
         for (let hour = openHour; hour < closeHour; hour++) {
             slots.push(`${hour}:00 - ${hour + 1}:00`);
@@ -46,7 +48,7 @@ export default function Booking({ studio }: BookingProps) {
         const existingBookings = getBookings();
 
         const isSlotTaken = existingBookings.some(
-            (b: any) => b.studioId === studio.Id && b.date === date && b.timeSlot === timeSlot
+            (b: { studioId: number; date: string; timeSlot: string }) => b.studioId === studio.Id && b.date === date && b.timeSlot === timeSlot
         );
 
         if (isSlotTaken) {
@@ -71,6 +73,20 @@ export default function Booking({ studio }: BookingProps) {
         setTimeSlot('');
         setName('');
         setEmail('');
+
+        // Add a button to view bookings
+        toast.success(
+            <div className="flex items-center justify-between">
+                <span>Booking confirmed!</span>
+                <Link
+                    href="/booking-list"
+                    className="ml-4 px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                    View My Bookings
+                </Link>
+            </div>,
+            { duration: 5000 }
+        );
     };
 
 
@@ -106,18 +122,30 @@ export default function Booking({ studio }: BookingProps) {
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto bg-white border-0 shadow-2xl rounded-2xl">
-                <DialogHeader className="pb-6 border-b border-gray-100">
-                    <DialogTitle className="text-3xl font-bold text-gray-900 flex items-center">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                <DialogHeader className="pb-6 border-b border-gray-100 ">
+                    <div className="flex items-center justify-between">
+                        <DialogTitle className="text-3xl font-bold text-gray-900 flex items-center">
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div className="text-2xl font-bold text-gray-900">Book Studio</div>
+                                <div className="text-sm text-gray-500 font-normal">Complete your booking details</div>
+                            </div>
+                        </DialogTitle>
+                        <Link
+                            href="/booking-list"
+                            className="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-all duration-200 hover:shadow-sm group mr-4"
+                        >
+                            <svg className="w-4 h-4 mr-2 text-gray-500 group-hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
-                        </div>
-                        <div>
-                            <div className="text-2xl font-bold text-gray-900">Book Studio</div>
-                            <div className="text-sm text-gray-500 font-normal">Complete your booking details</div>
-                        </div>
-                    </DialogTitle>
+                            View Bookings
+                        </Link>
+
+                    </div>
                 </DialogHeader>
 
                 <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 py-6">
@@ -135,7 +163,7 @@ export default function Booking({ studio }: BookingProps) {
                                 </div>
                             </div>
 
-                            {/* Rating */}
+
                             <div className="flex items-center mb-4">
                                 <div className="flex items-center mr-3">
                                     {renderStars(studio.Rating)}
@@ -143,7 +171,7 @@ export default function Booking({ studio }: BookingProps) {
                                 <span className="text-sm font-medium text-gray-700">({studio.Rating})</span>
                             </div>
 
-                            {/* Location */}
+
                             <div className="flex items-center text-gray-600 mb-4">
                                 <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -152,7 +180,7 @@ export default function Booking({ studio }: BookingProps) {
                                 <span className="text-sm">{studio.Location.Area}, {studio.Location.City}</span>
                             </div>
 
-                            {/* Price */}
+
                             <div className="bg-white rounded-xl p-4 border border-gray-200">
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-gray-600 font-medium">Price per hour</span>
@@ -163,7 +191,7 @@ export default function Booking({ studio }: BookingProps) {
                             </div>
                         </div>
 
-                        {/* Amenities */}
+
                         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                             <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                                 <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

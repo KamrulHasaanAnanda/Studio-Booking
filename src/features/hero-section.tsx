@@ -1,9 +1,11 @@
 'use client';
 import React, { useState } from 'react';
 import { getDistance } from '@/shared/utils/helpers';
+import { Studio } from '@/types/studio';
+import Link from 'next/link';
 
 interface HeroSectionProps {
-    studios: any[];
+    studios: Studio[];
     searchRef: React.RefObject<HTMLDivElement>;
     searchQuery: string;
     handleSearchChange: (value: string) => void;
@@ -11,8 +13,8 @@ interface HeroSectionProps {
     showSuggestions: boolean;
     suggestions: string[];
     handleSuggestionClick: (suggestion: string) => void;
-    allStudios: any[];
-    setStudios: (studios: any[]) => void;
+    allStudios: Studio[];
+    setStudios: (studios: Studio[]) => void;
     setHasMore: (hasMore: boolean) => void;
 }
 
@@ -76,7 +78,7 @@ function HeroSection({
     };
 
     const filterStudiosByRadius = (userLat: number, userLon: number, radius: number) => {
-        const filtered = allStudios.filter((studio: any) => {
+        const filtered = allStudios.filter((studio: Studio) => {
             const studioLat = studio.Location.Coordinates.Latitude;
             const studioLon = studio.Location.Coordinates.Longitude;
             const distance = getDistance(userLat, userLon, studioLat, studioLon);
@@ -119,12 +121,12 @@ function HeroSection({
                 </svg>
             </div>
 
-            {/* Heading */}
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-800 mb-6 leading-tight">
+
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-gray-800 mb-6 leading-tight">
                 Find Your Perfect <br />
                 <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Creative Space</span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-12">
+            <p className="text-sm sm:text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-12">
                 Discover and book amazing studios for your creative projects. From cozy photography spaces to professional recording studios,
                 find the perfect place to bring your ideas to life.
             </p>
@@ -143,7 +145,7 @@ function HeroSection({
                         onChange={(e) => handleSearchChange(e.target.value)}
                         placeholder="Search by city, area, or location..."
                         aria-label="Search studios by city, area, or location"
-                        className="w-full bg-white/80 backdrop-blur-sm border-2 border-gray-200 rounded-2xl pl-16 pr-20 py-5 text-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition-all duration-300 shadow-lg hover:shadow-xl"
+                        className="w-full bg-white/80 backdrop-blur-sm border-2 border-gray-200 rounded-2xl pl-10 pr-10 sm:pl-16 sm:pr-20 py-3 sm:py-5 text-sm sm:text-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition-all duration-300 shadow-lg hover:shadow-xl"
                     />
 
                     {/* Clear Button */}
@@ -192,12 +194,12 @@ function HeroSection({
                             <p className="text-gray-600 font-medium">
                                 {studios.length === 0 ? (
                                     <span>
-                                        No studios found for "<span className="font-semibold text-gray-800">{searchQuery}</span>"
+                                        No studios found for &quot;<span className="font-semibold text-gray-800">{searchQuery}</span>&quot;
                                     </span>
                                 ) : (
                                     <span>
                                         Found <span className="font-bold text-orange-600 text-lg">{studios.length}</span>{' '}
-                                        studio{studios.length !== 1 ? 's' : ''} for "<span className="font-semibold text-gray-800">{searchQuery}</span>"
+                                        studio{studios.length !== 1 ? 's' : ''} for &quot;<span className="font-semibold text-gray-800">{searchQuery}</span>&quot;
                                     </span>
                                 )}
                             </p>
@@ -207,7 +209,9 @@ function HeroSection({
             </div>
 
 
-            {/* <div className="max-w-lg mx-auto mb-8">
+
+
+            <div className="max-w-lg mx-auto mb-8">
                 <div className="bg-gradient-to-br from-white to-orange-50 rounded-2xl p-8 shadow-xl border border-orange-200/50 backdrop-blur-sm">
                     <div className="text-center mb-6">
                         <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl mb-4 shadow-lg">
@@ -229,7 +233,7 @@ function HeroSection({
                                 <button
                                     key={r}
                                     onClick={() => handleRadiusChange(r)}
-                                    className={`relative px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${radius === r
+                                    className={`relative px-2 sm:px-4 py-2 sm:py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${radius === r
                                         ? 'bg-gradient-to-br from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/30'
                                         : 'bg-white text-gray-700 hover:bg-orange-50 border-2 border-gray-200 hover:border-orange-300'
                                         }`}
@@ -254,23 +258,14 @@ function HeroSection({
                             disabled={isSearchingByRadius}
                             className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-4 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none"
                         >
-                            {isSearchingByRadius ? (
-                                <>
-                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span>Getting your location...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <span>Search within {radius} km</span>
-                                </>
-                            )}
+                            <>
+                                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span>Search within {radius} km</span>
+                            </>
+
                         </button>
 
                         {studios.length !== allStudios.length && (
@@ -286,8 +281,8 @@ function HeroSection({
                         )}
                     </div>
 
-                    {/* Error Message */}
-            {/* {errorMessage && (
+
+                    {errorMessage && (
                         <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl">
                             <div className="flex items-start">
                                 <div className="flex-shrink-0">
@@ -300,28 +295,12 @@ function HeroSection({
                                 </div>
                             </div>
                         </div>
-                    )} */}
+                    )}
 
-            {/* Success Message */}
-            {/* {!errorMessage && studios.length !== allStudios.length && studios.length > 0 && (
-                        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
-                            <div className="flex items-start">
-                                <div className="flex-shrink-0">
-                                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
-                                <div className="ml-3">
-                                    <p className="text-green-700 text-sm font-medium">
-                                        Found <span className="font-bold text-green-800">{studios.length}</span> studio{studios.length !== 1 ? 's' : ''} within <span className="font-bold text-green-800">{radius} km</span> of your location
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )} */}
 
-            {/* </div>
-            </div> */}
+
+                </div>
+            </div>
         </div>
     );
 }

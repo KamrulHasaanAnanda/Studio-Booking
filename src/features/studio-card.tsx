@@ -1,7 +1,10 @@
-import Booking from '@/components/studio-list/Booking'
-import React, { memo } from 'react'
 
-function StudioCard({ studio }: { studio: any }) {
+import React, { memo } from 'react'
+import { Studio } from '@/types/studio'
+import dynamic from 'next/dynamic'
+
+let StudioBookingDialog = dynamic(() => import('@/components/studio-list/StudioBookingDialog'), { ssr: false })
+function StudioCard({ studio }: { studio: Studio }) {
     return (
         <div
             key={studio.Id}
@@ -20,11 +23,11 @@ function StudioCard({ studio }: { studio: any }) {
                         <p className="text-lg font-semibold">{studio.Type}</p>
                     </div>
                 </div>
-                {/* Price Badge */}
+
                 <div className="absolute top-4 right-4 bg-white/95 rounded-xl px-3 py-1 shadow-md">
                     <span className="text-lg font-bold text-green-600">৳{studio.PricePerHour}</span>
                 </div>
-                {/* Rating Badge */}
+
                 <div className="absolute top-4 left-4 bg-white/95 rounded-xl px-3 py-1 shadow-md">
                     <div className="flex items-center">
                         <svg className="w-4 h-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -36,7 +39,7 @@ function StudioCard({ studio }: { studio: any }) {
             </div>
 
             <div className="p-6">
-                {/* Studio Name */}
+
                 <div className="mb-4">
                     <h2 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-orange-600 transition-colors duration-300">
                         {studio.Name}
@@ -50,15 +53,15 @@ function StudioCard({ studio }: { studio: any }) {
                     </span>
                 </div>
 
-                {/* Location */}
+
                 <div className="mb-4">
                     <p className="text-sm font-medium text-gray-800">{studio.Location.City}, {studio.Location.Area}</p>
                     <p className="text-xs text-gray-500">{studio.Location.Address}</p>
                 </div>
 
-                {/* Amenities */}
+
                 <div className="mb-6">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-3">What's included</h3>
+                    <h3 className="text-sm font-semibold text-gray-800 mb-3">What&apos;s included</h3>
                     <div className="flex flex-wrap gap-2">
                         {studio.Amenities.slice(0, 3).map((amenity: string, index: number) => (
                             <span key={index} className="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full font-medium">
@@ -80,8 +83,8 @@ function StudioCard({ studio }: { studio: any }) {
                     </div>
                 </div>
 
-                {/* Booking Button */}
-                <Booking studio={studio} />
+
+                <StudioBookingDialog studio={studio} />
             </div>
         </div>
     )

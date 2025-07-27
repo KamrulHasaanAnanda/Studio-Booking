@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import Link from 'next/link';
 
 interface Booking {
     studioId: number;
@@ -16,8 +15,6 @@ interface Booking {
 
 export default function BookingListPage() {
     const [bookings, setBookings] = useState<Booking[]>([]);
-
-    // ✅ Load bookings from localStorage
     useEffect(() => {
         const storedBookings = localStorage.getItem('bookings');
         if (storedBookings) {
@@ -25,11 +22,6 @@ export default function BookingListPage() {
         }
     }, []);
 
-    const handleClearBookings = () => {
-        localStorage.removeItem('bookings');
-        setBookings([]);
-        toast.success('All bookings cleared successfully!');
-    };
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -56,11 +48,21 @@ export default function BookingListPage() {
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                         Manage and view all your studio booking reservations in one place
                     </p>
+
+                    {/* Back to Home Button */}
+                    <div className="mt-8">
+                        <Link href="/">
+                            <Button className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg">
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                </svg>
+                                Back to Home
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
 
-
-                {/* Bookings Grid */}
                 {bookings.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20">
                         <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
@@ -70,14 +72,15 @@ export default function BookingListPage() {
                         </div>
                         <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Bookings Yet</h3>
                         <p className="text-gray-500 text-center max-w-md mb-8">
-                            You haven't made any studio bookings yet. Start by exploring our available studios and make your first reservation!
+                            You haven&apos;t made any studio bookings yet. Start by exploring our available studios and make your first reservation!
                         </p>
-                        <Button
-                            className="bg-gradient-to-br from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600 text-white px-8 py-3 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg"
-                            onClick={() => window.location.href = '/'}
-                        >
-                            Browse Studios
-                        </Button>
+                        <Link href="/">
+                            <Button
+                                className="bg-gradient-to-br from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600 text-white px-8 py-3 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg"
+                            >
+                                Browse Studios
+                            </Button>
+                        </Link>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -86,7 +89,7 @@ export default function BookingListPage() {
                                 key={index}
                                 className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
                             >
-                                {/* Header with gradient background */}
+
                                 <div className="relative h-32 bg-gradient-to-br from-orange-400 via-red-500 to-pink-500 overflow-hidden">
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                                     <div className="absolute inset-0 flex items-center justify-center">
@@ -102,7 +105,7 @@ export default function BookingListPage() {
                                 </div>
 
                                 <div className="p-6">
-                                    {/* Booking Details */}
+
                                     <div className="space-y-4 mb-6">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">

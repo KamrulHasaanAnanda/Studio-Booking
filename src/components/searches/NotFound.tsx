@@ -9,7 +9,7 @@ function NotFound({ searchQuery, clearSearch }: { searchQuery: string, clearSear
                 </svg>
             </div>
             <h3 className="text-2xl font-bold text-gray-800 mb-4">No studios found</h3>
-            <p className="text-lg text-gray-600 mb-2">We couldn't find any studios matching "<span className="font-semibold">{searchQuery}</span>"</p>
+            <p className="text-lg text-gray-600 mb-2">We couldn&apos;t find any studios matching &quot;<span className="font-semibold">{searchQuery}</span>&quot;</p>
             <button
                 onClick={clearSearch}
                 className="bg-orange-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-orange-600 transition-colors duration-200 shadow-md"

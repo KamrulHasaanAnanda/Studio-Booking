@@ -7,12 +7,13 @@ import EndResult from '@/components/studio-list/EndResult';
 import NotFound from '@/components/searches/NotFound';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import StudioCard from '@/features/studio-card';
+import { Studio } from '@/types/studio';
 
 const ITEMS_PER_PAGE = 12;
 
 export default function Home() {
-  const [studios, setStudios] = useState<any[]>([]);
-  const [allStudios, setAllStudios] = useState<any[]>([]);
+  const [studios, setStudios] = useState<Studio[]>([]);
+  const [allStudios, setAllStudios] = useState<Studio[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
@@ -21,7 +22,7 @@ export default function Home() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const searchRef = useRef<HTMLDivElement | null>(null);
 
-  const getUniqueLocations = useCallback((studiosData: any[]) => {
+  const getUniqueLocations = useCallback((studiosData: Studio[]) => {
     const locations = new Set<string>();
     studiosData.forEach(studio => {
       locations.add(studio.Location.City);
@@ -154,7 +155,7 @@ export default function Home() {
             endMessage={<EndResult />}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {studios.map((studio: any, index: number) => (
+              {studios.map((studio: Studio, index: number) => (
                 <StudioCard key={studio.Id || index} studio={studio} />
               ))}
             </div>
@@ -163,7 +164,7 @@ export default function Home() {
 
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {studios.map((studio: any, index: number) => (
+              {studios.map((studio: Studio, index: number) => (
                 <StudioCard key={studio.Id || index} studio={studio} />
               ))}
             </div>
