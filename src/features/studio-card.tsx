@@ -38,7 +38,7 @@ function StudioCard({ studio }: { studio: any }) {
             <div className="p-6">
                 {/* Studio Name */}
                 <div className="mb-4">
-                    <h2 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-orange-600 transition-colors duration-300">
+                    <h2 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-orange-600 transition-colors duration-300">
                         {studio.Name}
                     </h2>
                     <span className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${studio.Type === 'Photography' ? 'bg-blue-100 text-blue-700' :
@@ -58,7 +58,7 @@ function StudioCard({ studio }: { studio: any }) {
 
                 {/* Amenities */}
                 <div className="mb-6">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-3">What's included</h3>
+                    <h3 className="text-xsfont-semibold text-gray-800 mb-3">What's included</h3>
                     <div className="flex flex-wrap gap-2">
                         {studio.Amenities.slice(0, 3).map((amenity: string, index: number) => (
                             <span key={index} className="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full font-medium">
@@ -73,7 +73,7 @@ function StudioCard({ studio }: { studio: any }) {
                     </div>
                 </div>
 
-                {/* Availability */}
+
                 <div className="mb-6 p-3 bg-green-50 rounded-xl border border-green-100">
                     <div className="text-sm text-green-700">
                         Open: {studio.Availability.Open} - {studio.Availability.Close}
@@ -81,7 +81,7 @@ function StudioCard({ studio }: { studio: any }) {
                 </div>
 
                 {/* Booking Button */}
-                <Booking id={studio.Id} />
+                <Booking studio={studio} />
             </div>
         </div>
     )
