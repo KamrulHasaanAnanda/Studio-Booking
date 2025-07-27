@@ -42,9 +42,8 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
 
         const page = parseInt(searchParams.get('page') || '1');
-        const limit = parseInt(searchParams.get('limit') || '20');
-        const location = searchParams.get('location') || '';
-
+        const limit = parseInt(searchParams.get('limit') || '12');
+        const search = searchParams.get('search')?.toLowerCase() || '';
 
         if (page < 1 || limit < 1) {
             return NextResponse.json(
@@ -53,13 +52,22 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        const totalStudios = studios.length;
+        // Filter studios by search if search query exists
+        let filteredStudios = studios;
+        if (search) {
+            filteredStudios = studios.filter(studio =>
+                studio.Location.Area.toLowerCase().includes(search) ||
+                studio.Location.City.toLowerCase().includes(search) ||
+                studio.Location.Address.toLowerCase().includes(search)
+            );
+        }
+
+        const totalStudios = filteredStudios.length;
         const totalPages = Math.ceil(totalStudios / limit);
         const startIndex = (page - 1) * limit;
         const endIndex = startIndex + limit;
 
-
-        const paginatedStudios = studios.slice(startIndex, endIndex);
+        const paginatedStudios = filteredStudios.slice(startIndex, endIndex);
 
         return NextResponse.json({
             success: true,
@@ -81,5 +89,6 @@ export async function GET(request: NextRequest) {
         );
     }
 }
+
 
 
