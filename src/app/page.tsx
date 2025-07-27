@@ -1,103 +1,191 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+import Booking from "@/components/studio-list/Booking";
+import StatsSection from '@/features/stats-section';
+import HeroSection from '@/features/hero-section';
+import GetDataLoader from '@/components/loaders/GetDataLoader';
+import EndResult from '@/components/studio-list/EndResult';
+import NotFound from '@/components/searches/NotFound';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import StudioCard from '@/features/studio-card';
+
+const ITEMS_PER_PAGE = 12;
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [studios, setStudios] = useState<any[]>([]);
+  const [allStudios, setAllStudios] = useState<any[]>([]);
+  const [totalStudiosNumber, setTotalStudiosNumber] = useState<number>(0);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const searchRef = useRef<HTMLDivElement | null>(null);
+
+  // ✅ Get unique locations for suggestions
+  const getUniqueLocations = useCallback((studiosData: any[]) => {
+    const locations = new Set<string>();
+    studiosData.forEach(studio => {
+      locations.add(studio.Location.City);
+      locations.add(studio.Location.Area);
+    });
+    return Array.from(locations).sort();
+  }, []);
+
+  // ✅ Filter studios based on search query
+  const filterStudios = useCallback((query: string, studiosData: any[]) => {
+    if (!query.trim()) return studiosData;
+
+    const lowerQuery = query.toLowerCase();
+    return studiosData.filter(studio =>
+      studio.Location.City.toLowerCase().includes(lowerQuery) ||
+      studio.Location.Area.toLowerCase().includes(lowerQuery) ||
+      studio.Location.Address.toLowerCase().includes(lowerQuery)
+    );
+  }, []);
+
+  // ✅ Update suggestions based on search query
+  const updateSuggestions = useCallback((query: string) => {
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    const uniqueLocations = getUniqueLocations(allStudios);
+    const filteredSuggestions = uniqueLocations.filter(location =>
+      location.toLowerCase().includes(query.toLowerCase())
+    );
+    setSuggestions(filteredSuggestions.slice(0, 5)); // Limit to 5
+  }, [allStudios, getUniqueLocations]);
+
+  // ✅ Handle search change
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    setShowSuggestions(true);
+    updateSuggestions(value);
+
+    const filtered = filterStudios(value, allStudios);
+    setStudios(filtered);
+    setHasMore(false); // ✅ Disable infinite scroll during search
+  }, [filterStudios, allStudios, updateSuggestions]);
+
+  // ✅ Handle suggestion click
+  const handleSuggestionClick = useCallback((suggestion: string) => {
+    setSearchQuery(suggestion);
+    setShowSuggestions(false);
+
+    const filtered = filterStudios(suggestion, allStudios);
+    setStudios(filtered);
+    setHasMore(false);
+  }, [filterStudios, allStudios]);
+
+  // ✅ Clear search
+  const clearSearch = useCallback(() => {
+    setSearchQuery('');
+    setShowSuggestions(false);
+    setSuggestions([]);
+    setStudios(allStudios);
+    setHasMore(true);
+    setPage(1);
+  }, [allStudios]);
+
+  // ✅ Fetch studios
+  const fetchStudios = useCallback(async (pageNum: number) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/studios?page=${pageNum}&limit=${ITEMS_PER_PAGE}`);
+      const data = await response.json();
+
+      if (data.success) {
+        if (pageNum === 1) {
+          setStudios(data.data);
+          setTotalStudiosNumber(data.pagination.totalStudios);
+        } else {
+          setStudios(prev => [...prev, ...data.data]);
+        }
+
+        setHasMore(data.pagination.hasNextPage);
+      } else {
+        console.error('Error fetching studios:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching studios:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStudios(page);
+  }, [page, fetchStudios]);
+
+  const loadMoreData = () => {
+    setPage(prevPage => prevPage + 1);
+  };
+
+  // ✅ Close suggestions on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
+      <div className="container mx-auto px-6 py-12">
+        {/* Hero Section */}
+        <HeroSection
+          studios={studios}
+          searchRef={searchRef as React.RefObject<HTMLDivElement>}
+          searchQuery={searchQuery}
+          handleSearchChange={handleSearchChange}
+          clearSearch={clearSearch}
+          showSuggestions={showSuggestions}
+          suggestions={suggestions}
+          handleSuggestionClick={handleSuggestionClick}
+        />
+
+        <StatsSection studios={totalStudiosNumber} />
+
+        {/* ✅ Infinite Scroll (Only active when NOT searching) */}
+        {!searchQuery ? (
+          <InfiniteScroll
+            dataLength={studios.length}
+            next={loadMoreData}
+            hasMore={hasMore}
+            loader={<GetDataLoader />}
+            endMessage={<EndResult />}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {studios.map((studio: any, index: number) => (
+                <StudioCard key={index} studio={studio} />
+              ))}
+            </div>
+          </InfiniteScroll>
+        ) : (
+          <>
+            {/* If searching, show results without infinite scroll */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {studios.map((studio: any) => (
+                <div key={studio.Id} className="group bg-white rounded-2xl shadow-lg border p-6">{studio.Name}</div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* No result when searching */}
+        {searchQuery && studios.length === 0 && !loading && (
+          <NotFound searchQuery={searchQuery} clearSearch={clearSearch} />
+        )}
+      </div>
     </div>
   );
 }
