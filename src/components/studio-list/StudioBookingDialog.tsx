@@ -74,19 +74,7 @@ export default function StudioBookingDialog({ studio }: BookingProps) {
         setName('');
         setEmail('');
 
-        // Add a button to view bookings
-        toast.success(
-            <div className="flex items-center justify-between">
-                <span>Booking confirmed!</span>
-                <Link
-                    href="/booking-list"
-                    className="ml-4 px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                    View My Bookings
-                </Link>
-            </div>,
-            { duration: 5000 }
-        );
+
     };
 
 
